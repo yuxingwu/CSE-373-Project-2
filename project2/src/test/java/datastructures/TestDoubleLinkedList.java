@@ -524,4 +524,78 @@ public class TestDoubleLinkedList extends BaseTest {
             count += 2;
         }
     }
+    
+    // Test delete happy case and edge cases (front and back)
+    @Test(timeout=1000)
+    public void testDeleteBasic() {
+        IList<String> list = this.makeBasicList();
+        // Test delete middle item
+        list.delete(1);
+        this.assertListMatches(new String[] {"a", "c"}, list);
+        
+        // Test delete first item
+        list.delete(1);
+        this.assertListMatches(new String[] {"a"}, list);
+        
+        // Test delete last item
+        list.delete(0);
+        this.assertListMatches(new String[] {}, list);
+        
+    }
+    
+    @Test(timeout=1000)
+    public void testDeleteOnEmptyListThrowsException() {
+        IList<Integer> list = this.makeInstance();
+        try {
+            list.delete(0);
+            // We didn't throw an exception? Fail now.
+            fail("Expected EmptyContainerException");
+        } catch (EmptyContainerException ex) {
+            // Do nothing: this is ok
+        }
+        
+    }
+    
+    
+    @Test(timeout=1000)
+    public void testDeleteOutOfBoundsThrowsException() {
+        IList<String> list = this.makeBasicList();
+        try {
+            list.delete(-1);
+            fail("Expected IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException ex) {
+            // This is ok: do nothing
+        }
+        
+        try {
+            list.delete(3);
+            fail("Expected IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException ex) {
+            // This is ok: do nothing
+        }
+    }
+    
+    @Test(timeout=1000)
+    public void testDeleteUpdatesSize() {
+        IList<String> list = this.makeBasicList();
+        list.delete(0);
+        assertEquals(2, list.size());
+    }
+    
+    
+    // this also tests updating size
+    @Test(timeout=30 * SECOND)
+    public void testDeleteIsEfficient() {
+        IList<Integer> list = this.makeInstance();
+        int cap = 5000000;
+        // add 5000000 to list
+        for (int i = 0; i < cap; i++) {
+            list.add(i * 2);
+        }
+        // now delete all 5000000
+        for (int i = 0; i < cap; i++) {
+            list.delete(0);
+        }
+        assertEquals(0, list.size());
+    }
 }
