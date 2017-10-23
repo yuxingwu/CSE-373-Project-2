@@ -1,20 +1,12 @@
 package datastructures.concrete.dictionaries;
 
 import datastructures.concrete.KVPair;
-import datastructures.concrete.DoubleLinkedList.Node;
-import datastructures.concrete.dictionaries.ArrayDictionary.Pair;
-import datastructures.concrete.dictionaries.ChainedHashDictionary.ChainedIterator;
 import datastructures.interfaces.IDictionary;
 import misc.exceptions.NoSuchKeyException;
 import misc.exceptions.NotYetImplementedException;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
-/**
- * TODO: Replace this file with the one you wrote from project 1
- * TODO: Add the missing "iterator()" method
- */
 
 
 
@@ -167,27 +159,30 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     
     public Iterator<KVPair<K, V>> iterator() {
         // Note: you do not need to change this method
-        return new ArrayDictionaryIterator<>(this.pairs);
+        return new ArrayDictionaryIterator<>(pairs);
     }
     
-    private static class ArrayDictionaryIterator<K, V> implements Iterator<KVPair<K, V>> {
-        private IDictionary<K, V>[] pairs;
-
-        public ArrayDictionaryIterator(IDictionary<K, V>[] pairs) {
+    private class ArrayDictionaryIterator<T> implements Iterator<KVPair<K, V>> {
+        private int current = 0;
+        private Pair<K, V>[] pairs;
+        
+        public ArrayDictionaryIterator(Pair<K, V>[] pairs) {
             this.pairs = pairs;
         }
-
+        
         @Override
         public boolean hasNext() {
-        		// return (pairs.next != null);       		
+            return current < size;
         }
-
+        
         @Override
         public KVPair<K, V> next() {
-        		if (!hasNext()) {
+            if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            throw new NotYetImplementedException();
+            int prev = current;
+            current++;
+            return new KVPair(pairs[prev].key, pairs[prev].value);
         }
     }
 }
