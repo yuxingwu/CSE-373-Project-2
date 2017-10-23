@@ -3,8 +3,10 @@ package datastructures.concrete.dictionaries;
 import datastructures.concrete.KVPair;
 import datastructures.concrete.DoubleLinkedList.Node;
 import datastructures.concrete.dictionaries.ArrayDictionary.Pair;
+import datastructures.concrete.dictionaries.ChainedHashDictionary.ChainedIterator;
 import datastructures.interfaces.IDictionary;
 import misc.exceptions.NoSuchKeyException;
+import misc.exceptions.NotYetImplementedException;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -160,6 +162,32 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
         @Override
         public String toString() {
             return key + "=" + value;
+        }
+    }
+    
+    public Iterator<KVPair<K, V>> iterator() {
+        // Note: you do not need to change this method
+        return new ArrayDictionaryIterator<>(this.pairs);
+    }
+    
+    private static class ArrayDictionaryIterator<K, V> implements Iterator<KVPair<K, V>> {
+        private IDictionary<K, V>[] pairs;
+
+        public ArrayDictionaryIterator(IDictionary<K, V>[] pairs) {
+            this.pairs = pairs;
+        }
+
+        @Override
+        public boolean hasNext() {
+        		// return (pairs.next != null);       		
+        }
+
+        @Override
+        public KVPair<K, V> next() {
+        		if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            throw new NotYetImplementedException();
         }
     }
 }
