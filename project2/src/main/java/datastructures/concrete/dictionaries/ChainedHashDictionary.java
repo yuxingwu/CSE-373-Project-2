@@ -17,12 +17,15 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
     private IDictionary<K, V>[] chains;
 
     // You're encouraged to add extra fields (and helper methods) though!
+    
     private int size; 		//number of elements in the hash table
     private int numBuckets; //number of buckets for storage in hash table
     
     //prime numbers to use in resizing each are roughly double than the previous index
+    //TODO: add more prime numbers
     private int[] primeNumbers = {7, 13, 29, 59, 113, 227, 557, 1117}; 
     private int primeNumberIndex = 0; //current index in primeNumber array being used
+    private double loadFactor = 0.75;
     
     public ChainedHashDictionary() {
     	this.chains = makeArrayOfChains(7);
@@ -47,15 +50,11 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
     @Override
     public V get(K key) {
     	//get the hashcode for the key
-        int hashCode = key.hashCode();
+        int hashCode = key.hashCode() % numBuckets;
         //Variable to store value
         V value = null;
         //iterate through the array until you find the key
-        for(int i = 0; i < chains.length; i++) {
-        	if(hashCode == i) {
-        		value = chains[i].get(key);
-        	}
-        }
+        value = chains[hashCode].get(key);
 		if(value == null) {
         	throw new NoSuchElementException();
         }
@@ -65,7 +64,14 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
     @Override
     public void put(K key, V value) {
     	//make a KVPair using parameters
+    	KVPair<K,V> pair = new KVPair<K,V>(key, value);
     	//create a hashcode for that KVPair
+    	int hashCode;
+    	if(key == null) {
+    		hashCode = 0;
+    	} else {
+    		hashCode = pair.hashCode() % numBuckets;
+    	}
     	//Attempt to insert it into the array using that hashcode
     	
     	//Worst Case: Resize
@@ -73,39 +79,59 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
 			//if it does, make new Array table with the next prime number in primeNumber Array
 			//update primeNumberIndex
 			//iterate through all array indexes and rehash elements using new array size
+    	if(((double)this.numBuckets / (double)size) > loadFactor) { //i think this is correct????
+    		this.primeNumberIndex++;
+    		this.numBuckets = this.primeNumbers[this.primeNumberIndex];
+    		IDictionary<K, V>[] newChain = makeArrayOfChains(this.primeNumbers[this.primeNumberIndex]);
+    		for(int i = 0; i < chains.length; i++) {
+    			//chains[i].iterator();
+    		}
+    	}
     	
 		//Create ArrayDictionary Case:
 			//Create ArrayDictionary at that array index
 			//store KVPair using put method
 			//update size
-    	
+		if(chains[hashCode] == null) {
+			chains[hashCode] = new ArrayDictionary<K, V>();
+			chains[hashCode].put(key, value);
+			this.size++;
+		}
     	//best case: no need to resize or create ArrayDictionary
 			//use that ArrayDictionary's put method to store KVPair
 			//update size
-    	
-        throw new NotYetImplementedException();
+		else {
+			chains[hashCode].put(key, value);
+			this.size++;
+		}
     }
 
     @Override
     public V remove(K key) {
     	//Get hashcode from key
-    	//Iterate through the array
-    	//If it finds the key
-    		//use the ArrayDictionary remove method to remove the key
-    	//if not,
-    		//throw NoSuchElementException
-        throw new NotYetImplementedException();
+    	int hashCode;
+    	if(key == null) {
+    		hashCode = 0;
+    	} else {
+    		hashCode = key.hashCode() % numBuckets;
+    	}
+    	//use the ArrayDictionary remove method to remove the key
+    	V value = chains[hashCode].remove(key);
+    	return value;
     }
 
     @Override
     public boolean containsKey(K key) {
+    	boolean keyExists = false;
     	//Get hashcode from key
-    	//Iterate through array using hashcode
-    	//If it finds the key
-    		//use the ArrayDictionary containsKey() method to check
-    	//If it doesn't
-    		//Throw NoSuchElementException()
-        throw new NotYetImplementedException();
+    	int hashCode;
+    	if(key == null) {
+    		hashCode = 0;
+    	} else {
+    		hashCode = key.hashCode() % numBuckets;
+    	}
+    	//use the ArrayDictionary containsKey() method to check
+    	return chains[hashCode].containsKey(key);
     }
 
     @Override
