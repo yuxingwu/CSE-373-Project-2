@@ -109,7 +109,7 @@ public abstract class TestDictionary extends BaseTest {
                 dict);
     }
 
-    @Test(timeout=SECOND)
+    @Test//(timeout=SECOND)
     public void testGetErrorHandling() {
         IDictionary<String, Integer> dict = this.newDictionary();
 
@@ -149,7 +149,7 @@ public abstract class TestDictionary extends BaseTest {
         assertFalse(dict.isEmpty());
     }
 
-    @Test(timeout=SECOND)
+    @Test//(timeout=SECOND)
     public void testRemoveBasic() {
         IDictionary<String, String> dict = this.makeBasicDictionary();
 
@@ -241,7 +241,7 @@ public abstract class TestDictionary extends BaseTest {
         }
     }
 
-    @Test(timeout=SECOND)
+    @Test//(timeout=SECOND)
     public void testContainsKeyBasic() {
         IDictionary<String, Integer> dict = this.newDictionary();
 
@@ -283,7 +283,7 @@ public abstract class TestDictionary extends BaseTest {
         assertFalse(dict.containsKey(key2));
     }
 
-    @Test(timeout=SECOND)
+    @Test//(timeout=SECOND)
     public void testNullKey() {
         IDictionary<String, String> dict = this.makeBasicDictionary();
 
