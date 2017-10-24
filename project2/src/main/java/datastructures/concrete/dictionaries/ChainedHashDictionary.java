@@ -17,9 +17,17 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
     private IDictionary<K, V>[] chains;
 
     // You're encouraged to add extra fields (and helper methods) though!
-
+    private int size; 		//number of elements in the hash table
+    private int numBuckets; //number of buckets for storage in hash table
+    
+    //prime numbers to use in resizing each are roughly double than the previous index
+    private int[] primeNumbers = {7, 13, 29, 59, 113, 227, 557, 1117}; 
+    private int primeNumberIndex = 0; //current index in primeNumber array being used
+    
     public ChainedHashDictionary() {
-        throw new NotYetImplementedException();
+    	this.chains = makeArrayOfChains(7);
+        this.size = 0;
+        this.numBuckets = 7;
     }
 
     /**
@@ -38,27 +46,71 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
 
     @Override
     public V get(K key) {
-        throw new NotYetImplementedException();
+    	//get the hashcode for the key
+        int hashCode = key.hashCode();
+        //Variable to store value
+        V value = null;
+        //iterate through the array until you find the key
+        for(int i = 0; i < chains.length; i++) {
+        	if(hashCode == i) {
+        		value = chains[i].get(key);
+        	}
+        }
+		if(value == null) {
+        	throw new NoSuchElementException();
+        }
+        return value;
     }
 
     @Override
     public void put(K key, V value) {
+    	//make a KVPair using parameters
+    	//create a hashcode for that KVPair
+    	//Attempt to insert it into the array using that hashcode
+    	
+    	//Worst Case: Resize
+			//check if load factor exceeds 0.75
+			//if it does, make new Array table with the next prime number in primeNumber Array
+			//update primeNumberIndex
+			//iterate through all array indexes and rehash elements using new array size
+    	
+		//Create ArrayDictionary Case:
+			//Create ArrayDictionary at that array index
+			//store KVPair using put method
+			//update size
+    	
+    	//best case: no need to resize or create ArrayDictionary
+			//use that ArrayDictionary's put method to store KVPair
+			//update size
+    	
         throw new NotYetImplementedException();
     }
 
     @Override
     public V remove(K key) {
+    	//Get hashcode from key
+    	//Iterate through the array
+    	//If it finds the key
+    		//use the ArrayDictionary remove method to remove the key
+    	//if not,
+    		//throw NoSuchElementException
         throw new NotYetImplementedException();
     }
 
     @Override
     public boolean containsKey(K key) {
+    	//Get hashcode from key
+    	//Iterate through array using hashcode
+    	//If it finds the key
+    		//use the ArrayDictionary containsKey() method to check
+    	//If it doesn't
+    		//Throw NoSuchElementException()
         throw new NotYetImplementedException();
     }
 
     @Override
     public int size() {
-        throw new NotYetImplementedException();
+        return this.size;
     }
 
     @Override
