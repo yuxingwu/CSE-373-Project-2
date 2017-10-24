@@ -22,7 +22,7 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
     
     //prime numbers to use in resizing each are roughly double than the previous index
     //TODO: add more prime numbers
-    private int[] primeNumbers = {7, 13, 29, 59, 113, 227, 557, 1117}; 
+    private int[] primeNumbers = {7, 13, 29, 59, 113, 227, 557, 1117, 2237, 4547, 9013, 18049, 36083}; 
     private int primeNumberIndex = 0; //current index in primeNumber array being used
     private double loadFactor = 0.75;
     
