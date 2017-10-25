@@ -61,12 +61,12 @@ public class ChainedHashSet<T> implements ISet<T> {
 
         @Override
         public boolean hasNext() {
-            throw new NotYetImplementedException();
+        		return iter.hasNext();
         }
 
         @Override
         public T next() {
-            throw new NotYetImplementedException();
+        		return iter.next().getKey();
         }
     }
 }
