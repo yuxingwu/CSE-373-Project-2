@@ -18,25 +18,32 @@ public class ChainedHashSet<T> implements ISet<T> {
     public ChainedHashSet() {
         this.map = new ChainedHashDictionary<>();
     }
-
+    
+    // If the item already exists in the set, this method does nothing.
     @Override
     public void add(T item) {
-        throw new NotYetImplementedException();
+    		if (!map.containsKey(item)) {
+			map.put(item, true);
+		}
     }
-
+    
+    // @throws NoSuchElementException  if the set does not contain the given item
     @Override
     public void remove(T item) {
-        throw new NotYetImplementedException();
+    		if (!map.containsKey(item)) {
+			throw new NoSuchElementException();
+		}
+		map.remove(item);
     }
 
     @Override
     public boolean contains(T item) {
-        throw new NotYetImplementedException();
+    		return map.containsKey(item);
     }
 
     @Override
     public int size() {
-        throw new NotYetImplementedException();
+    		return map.size();
     }
 
     @Override

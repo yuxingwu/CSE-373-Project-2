@@ -4,6 +4,7 @@ import datastructures.concrete.KVPair;
 import datastructures.interfaces.IDictionary;
 import misc.exceptions.NoSuchKeyException;
 import misc.exceptions.NotYetImplementedException;
+import java.util.NoSuchElementException;
 
 import java.util.Iterator;
 
@@ -19,11 +20,7 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
     
     private int size; 		//number of elements in the hash table
     private int numBuckets; //number of buckets for storage in hash table
-    
-    //prime numbers to use in resizing each are roughly double than the previous index
-    //TODO: add more prime numbers
-    private int[] primeNumbers = {7, 13, 29, 59, 113, 227, 557, 1117, 2237, 4547, 9013, 18049, 36083};
-    private int primeNumberIndex = 0; //current index in primeNumber array being used
+
     private double loadFactor = 0.75;
     
     public ChainedHashDictionary() {
@@ -74,15 +71,38 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
         }
         //Attempt to insert it into the array using that hashcode
         
+        
+        //best case: no need to resize or create ArrayDictionary
+        //use that ArrayDictionary's put method to store KVPair
+        //update size if it's a new key
+        
+        if (chains[hashCode] == null) {
+        		chains[hashCode] = new ArrayDictionary<K, V>();
+        }
+        if(!chains[hashCode].containsKey(key)) {
+    			size++;
+        }
+        chains[hashCode].put(key, value);
+        
         //Worst Case: Resize
-        //check if load factor exceeds 0.75
-        if((double)size / (double)this.numBuckets > loadFactor) { //i think this is correct????
-            //update primeNumberIndex
-            primeNumberIndex++;
-            numBuckets = primeNumbers[primeNumberIndex];
-            //if it does, make new Array table with the next prime number in primeNumber Array
-            IDictionary<K, V>[] newChain = makeArrayOfChains(primeNumbers[primeNumberIndex]);
+        //check load factor
+        if (size >= numBuckets * loadFactor) {
+        		numBuckets *= 2;
+            IDictionary<K, V>[] newChain = makeArrayOfChains(numBuckets);
             //iterate through all array indexes and rehash elements using new array size
+            
+//            for (KVPair<K, V> item : this) {
+//				int newHashCode = item.getKey().hashCode() % numBuckets;
+//				if (newChain[newHashCode] == null) {
+//					newChain[newHashCode] = new ArrayDictionary<K, V>();
+//				}
+//				newChain[newHashCode].put(item.getKey(), item.getValue());
+//			}
+            
+            
+            //first iterate through chains array
+            //then each ArrayDictionary
+            //for every value, add it to the newChain            
             for(int i = 0; i < chains.length; i++) {
                 if(chains[i] != null) {
                     for(KVPair<K,V> temp : chains[i]) {
@@ -91,40 +111,12 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
                             newChain[newHashCode] = new ArrayDictionary<K, V>();
                             newChain[newHashCode].put(temp.getKey(), temp.getValue());
                         } else {
-                            chains[newHashCode].put(key, value);
+                            newChain[newHashCode].put(key, value);
                         }
-                    }
-                    //its really late and this is the best I could come up with. It's extremely slow
-                    //like... really slow. I'll sleep on it and see if I can do something about it tomorrow
-                    
-                    //what I did was first iterate through chains array
-                    //then each ArrayDictionary
-                    //for every value I find, I add it to the newChain in the same way I would normally add
-                    //a value (I duplicated the code below...)
+                    }                                
                 }
             }
-            this.chains = newChain;
-        }
-        
-        //Create ArrayDictionary Case:
-        //Create ArrayDictionary at that array index
-        //store KVPair using put method
-        //update size
-        if(chains[hashCode] == null) {
-            chains[hashCode] = new ArrayDictionary<K, V>();
-            chains[hashCode].put(key, value);
-            this.size++;
-        }
-        //best case: no need to resize or create ArrayDictionary
-        //use that ArrayDictionary's put method to store KVPair
-        //update size
-        else {
-            //only if a key doesnt exist will we increment size
-            if(!chains[hashCode].containsKey(key)) {
-                this.size++;
-            }
-            chains[hashCode].put(key, value);
-            
+            chains = newChain;
         }
     }
     
@@ -203,19 +195,39 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
     */
     private static class ChainedIterator<K, V> implements Iterator<KVPair<K, V>> {
         private IDictionary<K, V>[] chains;
+        private int current;
+        private int pairCurrent;
         
         public ChainedIterator(IDictionary<K, V>[] chains) {
             this.chains = chains;
+            this.current = 0;
+            this.pairCurrent = 0;
         }
         
         @Override
         public boolean hasNext() {
-            throw new NotYetImplementedException();
+        		return (current + 1 < chains.length && chains[current] != null && pairCurrent + 1 < chains[current].size());
         }
         
         @Override
         public KVPair<K, V> next() {
-            throw new NotYetImplementedException();
+        		if (current + 1 < chains.length) {
+        			if (chains[current] != null) {
+        				Iterator<KVPair<K, V>> iterator = chains[current].iterator();
+        				// pairCurrent += 1;
+        				// check end
+        				if (current + 1 < chains.length) {
+        					current++;
+        					iterator = chains[current].iterator();
+        				}
+        				return iterator.next();
+        			} else {
+        				current++;
+        				return next();
+        			}
+        		}
+    			throw new NoSuchElementException();
+
         }
     }
 }
