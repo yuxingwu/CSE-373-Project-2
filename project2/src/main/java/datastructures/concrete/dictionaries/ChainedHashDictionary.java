@@ -109,10 +109,8 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
                         int newHashCode = temp.getKey().hashCode() % numBuckets;
                         if(newChain[newHashCode] == null) {
                             newChain[newHashCode] = new ArrayDictionary<K, V>();
-                            newChain[newHashCode].put(temp.getKey(), temp.getValue());
-                        } else {
-                            newChain[newHashCode].put(temp.getKey(), temp.getValue());
                         }
+                        newChain[newHashCode].put(temp.getKey(), temp.getValue());
                     }                                
                 }
             }
