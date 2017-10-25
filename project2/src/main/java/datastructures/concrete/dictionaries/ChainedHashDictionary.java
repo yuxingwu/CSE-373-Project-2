@@ -91,14 +91,6 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
             IDictionary<K, V>[] newChain = makeArrayOfChains(numBuckets);
             //iterate through all array indexes and rehash elements using new array size
             
-//            for (KVPair<K, V> item : this) {
-//				int newHashCode = item.getKey().hashCode() % numBuckets;
-//				if (newChain[newHashCode] == null) {
-//					newChain[newHashCode] = new ArrayDictionary<K, V>();
-//				}
-//				newChain[newHashCode].put(item.getKey(), item.getValue());
-//			}
-            
             
             //first iterate through chains array
             //then each ArrayDictionary
@@ -210,22 +202,16 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
         @Override
         public KVPair<K, V> next() {
         		if (current + 1 < chains.length) {
+        			current++;
         			if (chains[current] != null) {
         				Iterator<KVPair<K, V>> iterator = chains[current].iterator();
-        				// pairCurrent += 1;
-        				// check end
-        				if (current + 1 < chains.length) {
-        					current++;
-        					iterator = chains[current].iterator();
-        				}
+        				pairCurrent++;
         				return iterator.next();
         			} else {
-        				current++;
         				return next();
         			}
         		}
     			throw new NoSuchElementException();
-
         }
     }
 }

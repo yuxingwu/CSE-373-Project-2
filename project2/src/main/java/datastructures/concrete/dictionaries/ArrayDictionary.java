@@ -182,7 +182,7 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
             }
             int prev = current;
             current++;
-            return new KVPair(pairs[prev].key, pairs[prev].value);
+            return new KVPair<K,V>(pairs[prev].key, pairs[prev].value);
         }
     }
 }
