@@ -111,7 +111,7 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
                             newChain[newHashCode] = new ArrayDictionary<K, V>();
                             newChain[newHashCode].put(temp.getKey(), temp.getValue());
                         } else {
-                            newChain[newHashCode].put(key, value);
+                            newChain[newHashCode].put(temp.getKey(), temp.getValue());
                         }
                     }                                
                 }
