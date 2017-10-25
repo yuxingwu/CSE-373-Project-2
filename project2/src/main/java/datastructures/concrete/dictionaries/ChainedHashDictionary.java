@@ -206,13 +206,19 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
         @Override
         public KVPair<K, V> next() {
         		if (current + 1 <= chains.length) {
-        			if (chains[current] != null && pairCurrent + 1 <= chains[current].size()) {
-    					Iterator<KVPair<K, V>> iterator = chains[current].iterator();
-    					for (int i = 0; i < pairCurrent; i++) {
-    						iterator.next();
-    					}
-        				pairCurrent++;
-        				return iterator.next();
+        			if (chains[current] != null) {
+        				if (pairCurrent < chains[current].size()) {
+	    					Iterator<KVPair<K, V>> iterator = chains[current].iterator();
+	    					for (int i = 0; i < pairCurrent; i++) {
+	    						iterator.next();
+	    					}
+	        				pairCurrent++;
+	        				return iterator.next();
+        				} else {
+        					pairCurrent = 0;
+        					current++;
+        					return next();
+        				}
         			} else {
         				current++;
         				return next();
