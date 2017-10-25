@@ -3,7 +3,6 @@ package datastructures.concrete.dictionaries;
 import datastructures.concrete.KVPair;
 import datastructures.interfaces.IDictionary;
 import misc.exceptions.NoSuchKeyException;
-import misc.exceptions.NotYetImplementedException;
 import java.util.NoSuchElementException;
 
 import java.util.Iterator;
@@ -113,7 +112,12 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
     @Override
     public V remove(K key) {
         //Get hashcode from key
-        int hashCode = Math.abs(key.hashCode() % numBuckets);
+    	int hashCode;
+    	if(key == null) {
+            hashCode = 0;           
+        } else {
+            hashCode = Math.abs(key.hashCode() % numBuckets);
+        }
         //use the ArrayDictionary remove method to remove the key
         if(chains[hashCode] == null || !chains[hashCode].containsKey(key)) {
             throw new NoSuchKeyException();
