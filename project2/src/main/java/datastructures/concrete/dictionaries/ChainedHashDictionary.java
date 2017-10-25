@@ -200,18 +200,21 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
         
         @Override
         public boolean hasNext() {
-        		return (current + 1 < chains.length && chains[current] != null && pairCurrent + 1 < chains[current].size());
+        		return (current + 1 <= chains.length && chains[current] != null && pairCurrent + 1 <= chains[current].size());
         }
         
         @Override
         public KVPair<K, V> next() {
-        		if (current + 1 < chains.length) {
-        			current++;
-        			if (chains[current] != null) {
-        				Iterator<KVPair<K, V>> iterator = chains[current].iterator();
+        		if (current + 1 <= chains.length) {
+        			if (chains[current] != null && pairCurrent + 1 <= chains[current].size()) {
+    					Iterator<KVPair<K, V>> iterator = chains[current].iterator();
+    					for (int i = 0; i < pairCurrent; i++) {
+    						iterator.next();
+    					}
         				pairCurrent++;
         				return iterator.next();
         			} else {
+        				current++;
         				return next();
         			}
         		}

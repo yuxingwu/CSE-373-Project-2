@@ -68,7 +68,7 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
         // if exists, update
         boolean exists = false;
         for (int i = 0; i < size; i++) {
-            if (key == pairs[i].key) {
+            if ((key == pairs[i].key || (key != null && key.equals(pairs[i].key)))) {
                 pairs[i].value = value;
                 exists = true;
             }
