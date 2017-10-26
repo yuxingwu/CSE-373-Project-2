@@ -19,7 +19,7 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
     
     private int size; 		//number of elements in the hash table
     private int numBuckets; //number of buckets for storage in hash table
-
+    
     private double loadFactor = 0.75;
     
     public ChainedHashDictionary() {
@@ -42,13 +42,12 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
         return (IDictionary<K, V>[]) new IDictionary[size];
     }
     
-    //TODO: Figure out these god damn null cases
     @Override
     public V get(K key) {
         //get the hashcode for the key
         int hashCode;
         if (key == null) {
-            hashCode = 0;          
+            hashCode = 0;
         } else {
             hashCode = Math.abs(key.hashCode() % numBuckets);
         }
@@ -63,7 +62,7 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
     public void put(K key, V value) {
         //create a hashcode for that KVPair
         int hashCode;
-        if(key == null) {
+        if (key == null) {
             hashCode = 0;
         } else {
             hashCode = Math.abs(key.hashCode() % numBuckets);
@@ -76,33 +75,33 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
         //update size if it's a new key
         
         if (chains[hashCode] == null) {
-        		chains[hashCode] = new ArrayDictionary<K, V>();
+            chains[hashCode] = new ArrayDictionary<K, V>();
         }
-        if(!chains[hashCode].containsKey(key)) {
-    			size++;
+        if (!chains[hashCode].containsKey(key)) {
+            size++;
         }
         chains[hashCode].put(key, value);
         
         //Worst Case: Resize
         //check load factor
         if (size >= numBuckets * loadFactor) {
-        		numBuckets *= 2;
+            numBuckets *= 2;
             IDictionary<K, V>[] newChain = makeArrayOfChains(numBuckets);
             //iterate through all array indexes and rehash elements using new array size
             
             
             //first iterate through chains array
             //then each ArrayDictionary
-            //for every value, add it to the newChain            
-            for(int i = 0; i < chains.length; i++) {
-                if(chains[i] != null) {
-                    for(KVPair<K,V> temp : chains[i]) {
+            //for every value, add it to the newChain
+            for (int i = 0; i < chains.length; i++) {
+                if (chains[i] != null) {
+                    for (KVPair<K, V> temp : chains[i]) {
                         int newHashCode = temp.getKey().hashCode() % numBuckets;
-                        if(newChain[newHashCode] == null) {
+                        if (newChain[newHashCode] == null) {
                             newChain[newHashCode] = new ArrayDictionary<K, V>();
                         }
                         newChain[newHashCode].put(temp.getKey(), temp.getValue());
-                    }                                
+                    }
                 }
             }
             chains = newChain;
@@ -112,14 +111,14 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
     @Override
     public V remove(K key) {
         //Get hashcode from key
-    	int hashCode;
-    	if(key == null) {
-            hashCode = 0;           
+        int hashCode;
+        if (key == null) {
+            hashCode = 0;
         } else {
             hashCode = Math.abs(key.hashCode() % numBuckets);
         }
         //use the ArrayDictionary remove method to remove the key
-        if(chains[hashCode] == null || !chains[hashCode].containsKey(key)) {
+        if (chains[hashCode] == null || !chains[hashCode].containsKey(key)) {
             throw new NoSuchKeyException();
         }
         V value = chains[hashCode].remove(key);
@@ -131,8 +130,8 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
     public boolean containsKey(K key) {
         //Get hashcode from key
         int hashCode;
-        if(key == null) {
-            hashCode = 0;           
+        if (key == null) {
+            hashCode = 0;
         } else {
             hashCode = Math.abs(key.hashCode() % numBuckets);
         }
@@ -190,41 +189,48 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
     private static class ChainedIterator<K, V> implements Iterator<KVPair<K, V>> {
         private IDictionary<K, V>[] chains;
         private int current;
-        private int pairCurrent;
+        private Iterator<KVPair<K, V>> iter;
         
         public ChainedIterator(IDictionary<K, V>[] chains) {
             this.chains = chains;
             this.current = 0;
-            this.pairCurrent = 0;
+            if (this.chains[current] != null) {
+                this.iter = this.chains[current].iterator();
+            }
         }
         
         @Override
         public boolean hasNext() {
-        		return (current + 1 <= chains.length && chains[current] != null && pairCurrent + 1 <= chains[current].size());
+            // If iterator is null or out of results
+            if (iter == null || !iter.hasNext()) {
+                // If we have nowhere left to go
+                if (current + 1 == chains.length) {
+                    return false;
+                }
+                // Move to next chain
+                current++;
+                
+                // If the new chain is filled
+                if (chains[current] != null) {
+                    // Fill our iterator
+                    iter = chains[current].iterator();
+                } else {
+                    // Otherwise null our iterator
+                    iter = null;
+                }
+                // Run back through and check for a result
+                return this.hasNext();
+            }
+            // We have a result
+            return true;
         }
         
         @Override
         public KVPair<K, V> next() {
-        		if (current + 1 <= chains.length) {
-        			if (chains[current] != null) {
-        				if (pairCurrent < chains[current].size()) {
-	    					Iterator<KVPair<K, V>> iterator = chains[current].iterator();
-	    					for (int i = 0; i < pairCurrent; i++) {
-	    						iterator.next();
-	    					}
-	        				pairCurrent++;
-	        				return iterator.next();
-        				} else {
-        					pairCurrent = 0;
-        					current++;
-        					return next();
-        				}
-        			} else {
-        				current++;
-        				return next();
-        			}
-        		}
-    			throw new NoSuchElementException();
+            if (!this.hasNext()) {
+                throw new NoSuchElementException();
+            }
+            return iter.next();
         }
     }
 }
